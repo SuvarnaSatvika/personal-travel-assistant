@@ -128,12 +128,10 @@ prompt = ChatPromptTemplate.from_messages([
 chain = prompt | llm_with_tools
 
 chat_history = []
-print("Travel agent is ready! (Type 'finalize' when happy or 'quit' or 'exit' to exit)\n")
+print("Travel agent is ready! (Type 'finalize' when happy\n")
 
-while True:
-    user_input = input("You: ")
-    if user_input.lower() in ['quit', 'exit']:
-        break
+def process_chat(user_input: str):
+    """Takes a user string, runs the loop and returns the response"""
 
     chat_history.append(HumanMessage(content=user_input))
 
@@ -144,32 +142,31 @@ while True:
             agent_text = response.content if isinstance(response.content, str) else "".join([b.get("text", "") for b in response.content if "text" in b])
 
             if not agent_text.strip():
-                agent_text = "I am sorry"
+                agent_text = "I am sorry I could not process that! Can you rephrase?"
 
-            print(f"\nAgent: {agent_text}\n")
             chat_history.append(AIMessage(content=agent_text))
-            break
+            return {"type": "chat", "content" : agent_text}
 
         chat_history.append(response)
 
         for tool_call in response.tool_calls:
             if tool_call['name'] == 'export_to_ui':
-                json_output = json.dumps(tool_call['args'], indent=2)
-                print(json_output)
-                exit()
+                return {"type": "json_ui", "content": tool_call['args']}
+
             elif tool_call['name'] == 'web_search':
                 query = tool_call['args'].get('query', '')
                 print(f"searching the web for {query}")
 
-                search_result = web_search.invoke(query)
-                print(f"Search found {str(search_result)[:100]}")
-
+                search_result = web_search.invoke({"query": query})
                 chat_history.append(ToolMessage(
                     tool_call_id = tool_call['id'],
                     content = str(search_result)
                 ))
+
             elif tool_call['name'] == 'get_local_events':
-                location = tool_call['args'].get('location', 'Portland')
+                location = tool_call['args'].get('location')
+                if not location:
+                    return "Error: You must provide a location to get events"
 
                 event_data = get_local_events.invoke({"location" : location})
 
