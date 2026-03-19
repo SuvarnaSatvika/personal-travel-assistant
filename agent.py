@@ -13,7 +13,6 @@ from pydantic import BaseModel, Field
 #Loading API key from .env file
 load_dotenv(override=True)
 
-# --- ADD THIS DEBUG BLOCK ---
 current_key = os.getenv("GOOGLE_API_KEY")
 
 class Activity(BaseModel):
@@ -29,12 +28,11 @@ class DayPlan(BaseModel):
 def export_to_ui(destination: str, total_budget: str, days: list[DayPlan]):
     """Call this tool ONLY when the user is happy with the itinerary and wants to finalize or save it"""
 
-    final_data = {
+    return {
         "destination": destination,
         "total_budget_estimate": total_budget,
-        "days": [day.dict() for day in days]
+        "itinerary": [day.dict() for day in days]
     }
-    return json.dumps(final_data, indent=2)
 
 ddg_search = DuckDuckGoSearchRun()
 
@@ -117,7 +115,12 @@ If the user asks follow-up questions, use the context of the itinerary you alrea
 If the user asks for real-time data, use the web_search tool to find the exact answer.
 If the user asks for live event, concerts or festivals, you MUST use the get_local_events tool.
 NEVER tell the user to check a website or listing platform. You MUST provide the actual event names and venues directly to the user.
-Do not call to 'export_to_ui' tool until the user explicitly agrees the plan is perfect and tells you to finalize or save it.
+When a user asks for recommendations in a specific city, you MUST verify the location of every result. Do not suggest any place outside 
+the requested city limits. If a search result is from a neighboring city, 
+DISCARD it and find a local alternative.
+When the user says "finalize" or explicitly agrees the plan is perfect, you MUST call the 'export_to_ui' tool to save the itinerary. 
+DO NOT type raw JSON, dictionaries, or code blocks into the chat message. 
+You must pass the destination, total_budget, and a detailed list of days directly into the tool's arguments.
 """
 
 prompt = ChatPromptTemplate.from_messages([

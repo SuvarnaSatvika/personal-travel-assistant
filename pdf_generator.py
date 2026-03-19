@@ -2,44 +2,49 @@ from fpdf import FPDF
 import os
 
 def generate_itinerary_pdf(itinerary_data: dict) -> str:
-    """Takes JSON data and generates a PDF"""
+    """Takes JSON data and generates a PDF based on the AI's raw tool arguments"""
 
     pdf = FPDF()
     pdf.add_page()
 
-    #Title
+    def clean_text(text):
+        return str(text).encode('latin-1', 'replace').decode('latin-1')
+
+    # 1. Title
     pdf.set_font("Helvetica", "B", 24)
-    pdf.cell(0,20, f"Trip to {itinerary_data.get('destination', 'unknown')}", ln=True, align="C")
+    dest = itinerary_data.get('destination', 'Your Trip')
+    pdf.cell(0, 20, clean_text(f"Trip to {dest}"), ln=True, align="C")
 
-    #Subtitle
-    pdf.set_font("Helvetica", "I", 12)
-    pdf.cell(0, 10, "Your Travel itinerary is here", ln=True, align="C")
-    pdf.ln(10)
+    days_list = itinerary_data.get("days", [])
 
-    #Day-wise itinerary
-    if "itinerary" in itinerary_data and itinerary_data["itinerary"]:
-        pdf.set_font("Helvetica" , "B", 16)
-        pdf.cell(0,10, "Daily Plan", ln=True)
+    if isinstance(days_list, list) and len(days_list) > 0:
+        for day in days_list:
+            # Print Day Header
+            pdf.set_font("Helvetica", "B", 14)
+            day_num = day.get('day_number', '?')
+            pdf.cell(0, 10, clean_text(f"Day {day_num}"), ln=True)
+            
+            # Print Activities
+            pdf.set_font("Helvetica", "", 12)
+            activities = day.get('activities', [])
+            
+            for act in activities:
+                time = act.get('time', 'TBD')
+                desc = act.get('description', 'No description')
+                
+                # Format:  [09:00 AM] Breakfast - @Cafe
+                line = f"  [{time}] {desc}"
+                pdf.multi_cell(0, 8, clean_text(line))
+            
+            pdf.ln(5) # Space between days
+    else:
         pdf.set_font("Helvetica", "", 12)
+        pdf.multi_cell(0, 8, "No itinerary details were found.")
 
-        for day_plan in itinerary_data["itinerary"]:
-            pdf.multi_cell(0,8,f"{day_plan}")
-            pdf.ln(2)
-        pdf.ln(5)
-    #Events
-    if "events" in itinerary_data:
-        pdf.set_font("Helvetica", "B", 16)
-        pdf.cell(0,10,"Events", ln=True)
-        pdf.set_font("Helvetica", "", 12)
-
-        for event in itinerary_data["events"]:
-            pdf.cell(0,8,f"-{event.get('name')} at {event.get('venue')}", ln=True)
-            pdf.set_text_color(100,100,100)
-            pdf.cell(0,6,f" Date: {event.get('date')} | Time: {event.get('time', 'TBD')}", ln=True)
-            pdf.set_text_color(0,0,0)
-
+    # Save and Export
     os.makedirs("exports", exist_ok=True)
-    file_path = f"exports/itinerary_{itinerary_data.get('destination', 'trip').lower()}.pdf"
+    safe_dest = dest.replace(' ', '_').replace(',', '').lower()
+    file_path = f"exports/itinerary_{safe_dest}.pdf"
+    
     pdf.output(file_path)
-
     return file_path

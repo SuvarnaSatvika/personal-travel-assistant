@@ -24,18 +24,7 @@ def chat_with_agent(request: ChatRequest):
     return ai_response
 
 @app.post("/api/generate-pdf")
-def create_pdf(request: ItineraryRequest):
-    print("\n Generating PDF....")
-
-    try:
-        itinerary_data = request.model_dump() if hasattr(request, 'model_dump') else request.dict()
-
-        file_path = generate_itinerary_pdf(itinerary_data)
-
-        return FileResponse(
-            path=file_path,
-            filename="My Itinerary.pdf",
-            media_type="application/pdf"
-        )
-    except Exception as e:
-        return {"error" : f"Failed to generate PDF {str(e)}"}
+async def generate_pdf(data: dict):
+    print(f"DEBUG FROM FRONTEND: {data}")
+    file_path = generate_itinerary_pdf(data)
+    return FileResponse(file_path)

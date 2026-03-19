@@ -1,124 +1,218 @@
-/* Centers the whole app on the screen */
+/* 1. Base Setup: Dark Mode by Default */
 body {
   margin: 0;
+  overflow: hidden;
+  background-color: #0f172a; /* Dark base so the bright Aurora pops */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #e2e8f0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  color: #f8fafc; /* Make all text default to off-white */
 }
 
-/* The main chat phone-like box */
-.chat-container {
-  width: 100%;
-  max-width: 500px;
-  height: 85vh;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+/* 2. Grid & Aurora Canvas */
+.app-wrapper {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+.aurora-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 3. Frosted Glass Sidebar */
+.sidebar {
+  background: rgba(15, 23, 42, 0.5); /* Deep translucent blue/black */
+  backdrop-filter: blur(15px); /* Strong frosted glass effect */
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 30px 25px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  gap: 20px;
+  z-index: 1;
 }
 
-/* The top banner */
-.chat-header {
-  background: #2563eb;
+.sidebar h1 {
+  margin-top: 0;
+  font-size: 1.8rem;
+  background: linear-gradient(135deg, #7cff67, #b19eef);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.filter-group label {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  margin-bottom: 5px;
+}
+
+.filter-group input, .filter-group select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
   color: white;
-  padding: 20px;
-  text-align: center;
+  outline: none;
+  box-sizing: border-box;
 }
 
-.chat-header h1 {
-  margin: 0;
-  font-size: 1.5rem;
+.filter-group input:focus, .filter-group select:focus {
+  border-color: #b19eef;
 }
 
-.chat-header p {
-  margin: 5px 0 0 0;
-  font-size: 0.9rem;
-  opacity: 0.9;
+.filter-group select option {
+  background-color: #0f172a;
+  color: white;
 }
 
-/* The scrolling area for messages */
+/* Make the PDF Button pop */
+.pdf-btn {
+  margin-top: auto;
+  padding: 15px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pdf-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+}
+
+/* 4. Main Chat Area */
+.main-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
+  background: transparent; /* Totally clear to let Aurora through */
+  z-index: 1;
+}
+
 .chat-window {
   flex: 1;
-  padding: 20px;
+  padding: 40px;
+  padding-bottom: 120px; /* Keep messages from hiding behind the floating input */
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  background: #f8fafc;
+  gap: 20px;
 }
 
-/* Base style for all message bubbles */
+/* 5. Sleek Welcome Banner */
+.welcome-banner {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-banner h2 {
+  margin-top: 0;
+  color: #b19eef;
+}
+
+/* 6. Message Bubbles */
 .message {
-  max-width: 75%;
-  padding: 12px 16px;
-  border-radius: 12px;
-  line-height: 1.4;
-  word-wrap: break-word;
+  padding: 15px 20px;
+  border-radius: 18px;
+  max-width: 70%;
+  line-height: 1.5;
 }
 
-.message strong {
-  display: block;
-  margin-bottom: 4px;
-  font-size: 0.8em;
-  opacity: 0.7;
-}
-
-/* User bubbles (Right side, Blue) */
+/* User Bubble: Vibrant Gradient */
 .message.user {
   align-self: flex-end;
-  background: #2563eb;
+  background: linear-gradient(135deg, #5227ff, #b19eef);
   color: white;
   border-bottom-right-radius: 4px;
+  box-shadow: 0 4px 15px rgba(82, 39, 255, 0.3);
 }
 
-/* AI bubbles (Left side, Gray) */
+/* Agent Bubble: Frosted Glass */
 .message.agent {
   align-self: flex-start;
-  background: #e2e8f0;
-  color: #1e293b;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
   border-bottom-left-radius: 4px;
 }
 
-/* The bottom input area */
+/* 7. Floating Input Dock */
 .input-area {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 75%;
+  max-width: 800px;
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 30px; /* Pill shape */
+  padding: 8px 10px 8px 25px;
   display: flex;
-  padding: 15px;
-  background: white;
-  border-top: 1px solid #e2e8f0;
-  gap: 10px;
+  gap: 15px;
+  align-items: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 .input-area input {
   flex: 1;
-  padding: 12px 15px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 1rem;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.05rem;
   outline: none;
-  transition: border-color 0.2s;
 }
 
-.input-area input:focus {
-  border-color: #2563eb;
+.input-area input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .input-area button {
-  padding: 0 20px;
-  background: #2563eb;
-  color: white;
+  padding: 12px 25px;
+  background: #f8fafc;
+  color: #0f172a;
   border: none;
-  border-radius: 8px;
+  border-radius: 20px;
+  font-weight: bold;
   font-size: 1rem;
   cursor: pointer;
-  font-weight: bold;
-  transition: background 0.2s;
+  transition: transform 0.2s, background 0.2s;
 }
 
 .input-area button:hover {
-  background: #1d4ed8;
+  transform: scale(1.05);
+  background: #7cff67;
+}
+
+/* Thinking text */
+.thinking-animation {
+  align-self: flex-start;
+  color: #7cff67;
+  font-style: italic;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
