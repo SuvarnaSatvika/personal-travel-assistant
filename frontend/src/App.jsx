@@ -20,7 +20,7 @@ function App() {
 
     const downloadPDF = async (finalData) => {
             try{
-                const response = await fetch('/api/generate-pdf', {
+                const response = await fetch('https://personal-travel-assistant.onrender.com/api/generate-pdf', {
                     method: 'POST',
                     headers: { 'Content-Type' : 'application/json'},
                     body: JSON.stringify(finalData),
@@ -68,7 +68,7 @@ function App() {
 
 
         try{
-            const response = await fetch('/api/chat', {
+            const response = await fetch('https://personal-travel-assistant.onrender.com/api/chat', {
                 method : 'POST',
                 headers : {
                     'Content-Type' : 'application/json',
