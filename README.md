@@ -2,7 +2,7 @@
 
 A full-stack, AI-powered travel planning application that acts as a personal concierge. Users can chat naturally with the AI to generate highly customized, multi-day travel itineraries, fetch live local events, and export their finalized plans as a formatted PDF.
 
-### [View Live Demo](https://your-vercel-link.vercel.app)
+### [View Live Demo](https://personal-travel-assistant-agrw.vercel.app/)
 
 ---
 
@@ -42,7 +42,7 @@ To run this project on your local machine, follow these steps:
 
 ### 1. Clone the repository
 ```bash
-git clone [https://github.com/your-username/ai-travel-assistant.git](https://github.com/your-username/ai-travel-assistant.git)
+git clone [https://github.com/SuvarnaSatvika/personal-travel-assistant.git]
 cd ai-travel-assistant
 ```
 
