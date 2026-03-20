@@ -1,11 +1,21 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from agent import process_chat
 from pdf_generator import generate_itinerary_pdf
 import os
 
-app = FastAPI(title = "Personal Travel Assistant")
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # This allows any website to talk to your API
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 class ChatRequest(BaseModel):
     message: str
 
